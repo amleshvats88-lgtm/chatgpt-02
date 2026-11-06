@@ -1,0 +1,12 @@
+
+{
+  "name": "ChatGPT 0.2",
+  "short_name": "ChatGPT",
+  "description": "My ChatGPT 0.2 Demo App",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#101426",
+  "theme_color": "#7559ff"
+}

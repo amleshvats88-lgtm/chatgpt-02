@@ -1,0 +1,200 @@
+
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#7559ff">
+<link rel="manifest" href="manifest.json">
+<title>ChatGPT 0.2</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ font-family:Arial,sans-serif;
+ background:#101426;
+ color:white;
+}
+header{
+ background:#7559ff;
+ padding:20px;
+ text-align:center;
+ font-size:24px;
+ font-weight:bold;
+}
+.container{padding:15px}
+.card{
+ background:#202943;
+ padding:15px;
+ border-radius:14px;
+ margin-bottom:15px;
+}
+h3{margin-top:0;color:#b9aaff}
+button{
+ background:#7559ff;
+ color:white;
+ border:0;
+ padding:12px;
+ border-radius:9px;
+ margin:5px 2px;
+ font-size:15px;
+}
+input,textarea{
+ width:100%;
+ padding:12px;
+ border-radius:9px;
+ border:0;
+ margin:7px 0;
+ background:#eef0fa;
+ color:#111;
+}
+textarea{min-height:90px}
+#output{
+ background:#151d32;
+ padding:12px;
+ border-radius:9px;
+ min-height:45px;
+ white-space:pre-wrap;
+ overflow-wrap:anywhere;
+}
+img{max-width:100%;border-radius:10px;margin-top:10px}
+</style>
+</head>
+
+<body>
+
+<header>✨ ChatGPT 0.2</header>
+
+<div class="container">
+
+<div class="card">
+<h3>🤖 AI Chat Demo</h3>
+<textarea id="chatInput" placeholder="अपना मैसेज लिखो..."></textarea>
+<button onclick="chat()">Send</button>
+<div id="chatOutput"></div>
+</div>
+
+<div class="card">
+<h3>✍️ AI Writing Helper</h3>
+<textarea id="writeInput" placeholder="कुछ लिखो..."></textarea>
+<button onclick="writing()">Create Text</button>
+<div id="writeOutput"></div>
+</div>
+
+<div class="card">
+<h3>🎤 Voice Assistant</h3>
+<button onclick="startVoice()">Start Voice</button>
+<button onclick="stopVoice()">Stop Voice</button>
+<div id="voiceOutput"></div>
+</div>
+
+<div class="card">
+<h3>🌐 Internet Search</h3>
+<input id="searchInput" placeholder="क्या सर्च करना है?">
+<button onclick="searchWeb()">Search Google</button>
+</div>
+
+<div class="card">
+<h3>📸 Photo Editor</h3>
+<input type="file" id="photoInput" accept="image/*">
+<div>
+<button onclick="filterPhoto('none')">Normal</button>
+<button onclick="filterPhoto('grayscale(1)')">B&W</button>
+<button onclick="filterPhoto('sepia(1)')">Vintage</button>
+<button onclick="filterPhoto('brightness(1.3)')">Bright</button>
+</div>
+<img id="photo" style="display:none">
+</div>
+
+<div class="card">
+<h3>🎵 Music Idea Generator</h3>
+<input id="musicInput" placeholder="Song का नाम या विषय लिखो">
+<button onclick="musicIdea()">Generate Idea</button>
+<div id="musicOutput"></div>
+</div>
+
+</div>
+
+<script>
+function chat(){
+ let msg=document.getElementById("chatInput").value.trim();
+ if(!msg)return;
+ document.getElementById("chatOutput").innerText=
+ "तुमने लिखा: "+msg+
+ "\nयह Chat Demo है। असली AI जवाब के लिए AI API जोड़नी होगी।";
+}
+
+function writing(){
+ let msg=document.getElementById("writeInput").value.trim();
+ if(!msg)return;
+ document.getElementById("writeOutput").innerText=
+ "तुम्हारा टेक्स्ट:\n"+msg+
+ "\n\nयह Writing Demo है।";
+}
+
+let recognition=null;
+
+function startVoice(){
+ const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SpeechRecognition){
+  alert("इस ब्राउज़र में Voice Recognition उपलब्ध नहीं है।");
+  return;
+ }
+ recognition=new SpeechRecognition();
+ recognition.lang="hi-IN";
+ recognition.onresult=function(event){
+  let text=event.results[0][0].transcript;
+  document.getElementById("voiceOutput").innerText=text;
+  if("speechSynthesis" in window){
+   let speech=new SpeechSynthesisUtterance(text);
+   speech.lang="hi-IN";
+   speechSynthesis.speak(speech);
+  }
+ };
+ recognition.onerror=function(){
+  document.getElementById("voiceOutput").innerText="Voice में समस्या आई।";
+ };
+ recognition.start();
+}
+
+function stopVoice(){
+ if(recognition)recognition.stop();
+}
+
+function searchWeb(){
+ let q=document.getElementById("searchInput").value.trim();
+ if(q)window.open("https://www.google.com/search?q="+encodeURIComponent(q),"_blank");
+}
+
+document.getElementById("photoInput").addEventListener("change",function(e){
+ let file=e.target.files[0];
+ if(!file)return;
+ let url=URL.createObjectURL(file);
+ let photo=document.getElementById("photo");
+ photo.src=url;
+ photo.style.display="block";
+});
+
+function filterPhoto(value){
+ document.getElementById("photo").style.filter=value;
+}
+
+function musicIdea(){
+ let topic=document.getElementById("musicInput").value.trim();
+ if(!topic)return;
+ document.getElementById("musicOutput").innerText=
+ "Song Topic: "+topic+
+ "\nStyle: Romantic / Sad\nMood: Emotional\nयह Music Idea Demo है, ऑडियो नहीं बनाता।";
+}
+
+if("serviceWorker" in navigator){
+ window.addEventListener("load",()=>{
+  navigator.serviceWorker.register("./sw.js")
+  .catch(err=>console.log("Service Worker Error:",err));
+ });
+}
+</script>
+
+</body>
+</html>
